@@ -1,47 +1,43 @@
-import readline from 'readline'
-
+import PromptSync from 'prompt-sync'
 
 class Calculator {
     constructor() {
-        console.log('Calculator initialized!')
+        console.log('Calculator initialized! Press CTRL ^ C to exit.')
 
-        // set the input
-        this.input = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        })
+        this.input = PromptSync({ sigint: true })
 
-        this.handleUserInput()
+        while (true) {
+            this.handleUserInput()
+        }
     }
 
     handleUserInput() {
-        this.input.question('> ', operation => {
-            const sanitizedOperation = operation.split(' ')
-            const [n1, operator, n2] = sanitizedOperation
 
-            /*
-                * Even if the user typed a number
-                * the input.question get the operation value as a string
-                * the most accurate way to check whether the value is a number or not, is using Regex
-                * isNumber() gets a parameter, and return true if it's a number
-            */
-            if (this.isNumber(n1) && this.isNumber(n2)) {
-                const possibleOperators = ['+', '-', '*', '/']
+        const operation = this.input('> ')
+        const [n1, operator, n2] = operation.split(' ')
 
-                if (possibleOperators.includes(operator)) {
-                    const value = this.handleOperation(n1, n2, operator)
-                    console.log(`${operation} = ${value}`)
-                } else {
-                    console.log('Invalid Operator')
-                }
+        /*
+            * Even if the user typed a number
+            * the input get the operation value as a string
+            * the most accurate way to check whether the value is a number or not, is using Regex
+            * isNumber() gets a parameter, and return true if it's a number
+        */
+
+        if (this.isNumber(n1) && this.isNumber(n2)) {
+            const possibleOperators = ['+', '-', '*', '/']
+
+            if (possibleOperators.includes(operator)) {
+                const result = this.handleOperation(Number(n1), Number(n2), operator)
+                return console.log(`${operation} = ${result}`)
             }
 
-            this.input.close()
-        })
+            return console.log('Invalid Operator')
+        }
+        return console.log('Invalid Number')
     }
 
     isNumber(n = 0) {
-        if (/^\d+$/.test(n)) return true
+        if (/^[0-9]/.test(n)) return true
 
         return false
     }
